@@ -47,9 +47,9 @@ const TodoItem: React.FC<ITodoItemProps> = (props) => {
     setIsModalOpen(false)
   }
 
-  const handleItemClick = (id: number) => {
+  const handleItemClick = async (id: number) => {
+    await getTodo(id)
     setIsModalOpen(true)
-    getTodo(id)
   }
 
   return (

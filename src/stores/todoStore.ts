@@ -19,7 +19,7 @@ interface TodoStore {
   currentTask: ITask | null
   filter: TFilter
   setFilter: (filter: TFilter) => void
-  getAllTodo: () => Promise<void>
+  getAllTodo: (page?: number) => Promise<void>
   getTodo: (id: number) => Promise<void>
   addTodo: (task: ITaskForAdd) => void
   removeTodo: (id: number) => void
@@ -45,7 +45,6 @@ const useTodoStore = create<TodoStore>((set) => ({
   currentTask: null,
   filter: 'ALL',
   setFilter: async (filter) => {
-    await useTodoStore.getState().getAllTodo()
     set((state) => {
       const filteredTodos = state.todos.list.filter((todo) => {
         if (filter === 'ALL') return true
@@ -64,11 +63,21 @@ const useTodoStore = create<TodoStore>((set) => ({
       }
     })
   },
-  getAllTodo: async () => {
-    const response = await axios.get(`${API_URL}/tasks`, {
-      headers,
-    })
-    set({ todos: convertDataFromServerToList(response.data) })
+  getAllTodo: async (page = 1) => {
+    const response = await axios.get(
+      `${API_URL}/tasks?sort=createdAt:desc&pagination[pageSize]=15&pagination[page]=${page}`,
+      {
+        headers,
+      },
+    )
+    const data = convertDataFromServerToList(response.data)
+    set((state) => ({
+      todos: {
+        ...state.todos,
+        list: page === 1 ? data.list : [...state.todos.list, ...data.list],
+        meta: data.meta,
+      },
+    }))
   },
   getTodo: async (id) => {
     const response = await axios.get(`${API_URL}/tasks/${id}`, {
@@ -78,31 +87,69 @@ const useTodoStore = create<TodoStore>((set) => ({
   },
   addTodo: async (task) => {
     const data = convertDataToServer(task)
-    await axios.post(`${API_URL}/tasks`, data, {
+    const response = await axios.post(`${API_URL}/tasks`, data, {
       headers,
     })
-    await useTodoStore.getState().getAllTodo()
+    set((state) => ({
+      todos: {
+        ...state.todos,
+        list: [convertDataFromServer(response.data), ...state.todos.list],
+        meta: {
+          ...state.todos.meta,
+          pagination: {
+            ...state.todos.meta.pagination,
+            total: state.todos.meta.pagination.total + 1,
+          },
+        },
+      },
+    }))
   },
   removeTodo: async (id) => {
     await axios.delete(`${API_URL}/tasks/${id}`, {
       headers,
     })
-    await useTodoStore.getState().getAllTodo()
+    set((state) => ({
+      todos: {
+        ...state.todos,
+        list: state.todos.list.filter((todo) => todo.id !== id),
+        meta: {
+          ...state.todos.meta,
+          pagination: {
+            ...state.todos.meta.pagination,
+            total: state.todos.meta.pagination.total - 1,
+          },
+        },
+      },
+    }))
   },
   updateTodo: async (id, task) => {
     const data = convertDataToServer(task)
-    await axios.put(`${API_URL}/tasks/${id}`, data, {
+    const response = await axios.put(`${API_URL}/tasks/${id}`, data, {
       headers,
     })
-    await useTodoStore.getState().getAllTodo()
+    set((state) => ({
+      todos: {
+        ...state.todos,
+        list: state.todos.list.map((todo) =>
+          todo.id === id ? convertDataFromServer(response.data) : todo,
+        ),
+      },
+    }))
   },
   toggleTodoStatus: async (task) => {
     const newTask = { ...task, status: task.status === 'completed' ? 'notCompleted' : 'completed' }
     const data = convertDataToServer(newTask)
-    await axios.put(`${API_URL}/tasks/${task.id}`, data, {
+    const response = await axios.put(`${API_URL}/tasks/${task.id}`, data, {
       headers,
     })
-    await useTodoStore.getState().getAllTodo()
+    set((state) => ({
+      todos: {
+        ...state.todos,
+        list: state.todos.list.map((todo) =>
+          todo.id === task.id ? convertDataFromServer(response.data) : todo,
+        ),
+      },
+    }))
   },
   toggleFavorite: (id) => {
     set((state) => ({

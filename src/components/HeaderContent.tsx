@@ -20,6 +20,7 @@ const HeaderContent: FC = () => {
   const { filter, setFilter, addTodo } = useTodoStore()
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
+  const [status, setStatus] = useState('')
 
   const showModal = () => {
     setIsModalOpen(true)
@@ -42,7 +43,7 @@ const HeaderContent: FC = () => {
   return (
     <HeaderContainer>
       <ButtonContainer>
-        <Button onClick={showModal}>Add Task</Button>
+        <Button onClick={showModal}>Добавить задачу</Button>
         <Select style={selectStyle} value={filter} onChange={(value: TFilter) => setFilter(value)}>
           <Option value='ALL'>Все</Option>
           <Option value='COMPLETED'>Выполненные</Option>
@@ -71,6 +72,12 @@ const HeaderContent: FC = () => {
             onChange={(e) => setDescription(e.target.value)}
             style={inputStyle}
           />
+          <Button
+            style={{ width: '100%' }}
+            onClick={() => setStatus(status === 'completed' ? 'notCompleted' : 'completed')}
+          >
+            {status === 'completed' ? 'Не выполнено' : 'Выполнено'}
+          </Button>
         </ModalContainer>
       </Modal>
     </HeaderContainer>
