@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react'
-import useTodoStore from '../stores/todoStore'
+import useTodoStore from '../../stores/todoStore'
 import { Button, Input, List, Modal } from 'antd'
 import { IoStarOutline, IoStarSharp, IoTrashOutline } from 'react-icons/io5'
-import { ITask } from '../types'
-import { ModalContainer } from '../styles/sharedStyles'
+import { ITask } from '../../types'
+import { ModalContainer } from '../../styles/sharedStyles'
 
 interface ITodoItemProps {
   task: ITask
@@ -55,16 +55,28 @@ const TodoItem: React.FC<ITodoItemProps> = (props) => {
   return (
     <>
       <List.Item
+        data-testid='todo-item'
         actions={[
           <Button
+            data-testid='btn-favorite'
             onClick={() => toggleFavorite(task.id)}
             icon={task.favorite ? <IoStarSharp /> : <IoStarOutline />}
           />,
-          <Button style={{ width: '150px' }} onClick={() => toggleTodoStatus(task)}>
+          <Button
+            data-testid='btn-status'
+            style={{ width: '150px' }}
+            onClick={() => toggleTodoStatus(task)}
+          >
             {task.status === 'completed' ? 'Не выполнено' : 'Выполнено'}
           </Button>,
-          <Button onClick={() => handleItemClick(task.id)}>Редактировать</Button>,
-          <Button onClick={() => removeTodo(task.id)} icon={<IoTrashOutline />} />,
+          <Button data-testid='btn-save' onClick={() => handleItemClick(task.id)}>
+            Редактировать
+          </Button>,
+          <Button
+            data-testid='btn-delete'
+            onClick={() => removeTodo(task.id)}
+            icon={<IoTrashOutline />}
+          />,
         ]}
       >
         <List.Item.Meta
@@ -75,7 +87,7 @@ const TodoItem: React.FC<ITodoItemProps> = (props) => {
       </List.Item>
       <Modal
         title='Редактировать задачу'
-        okText='Редактировать'
+        okText='Сохранить'
         cancelText='Отмена'
         open={isModalOpen}
         onOk={handleOk}
@@ -83,12 +95,14 @@ const TodoItem: React.FC<ITodoItemProps> = (props) => {
       >
         <ModalContainer>
           <Input
+            data-testid='btn-title-modal'
             placeholder='Название задачи'
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             style={inputStyle}
           />
           <Input.TextArea
+            data-testid='btn-description-modal'
             placeholder='Описание задачи'
             value={description}
             rows={5}
@@ -96,6 +110,7 @@ const TodoItem: React.FC<ITodoItemProps> = (props) => {
             style={textareaStyle}
           />
           <Button
+            data-testid='btn-status-modal'
             style={{ width: '100%' }}
             onClick={() => setStatus(status === 'completed' ? 'notCompleted' : 'completed')}
           >
@@ -107,4 +122,4 @@ const TodoItem: React.FC<ITodoItemProps> = (props) => {
   )
 }
 
-export default TodoItem
+export { TodoItem }

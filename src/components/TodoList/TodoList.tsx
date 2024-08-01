@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from 'react'
-
-import useTodoStore from '../stores/todoStore'
-import TodoItem from './TodoItem'
+import { TodoItem } from '../TodoItem/TodoItem'
+import useTodoStore from '../../stores/todoStore'
 import { Divider, List } from 'antd'
-import { ITask } from '../types'
+import { ITask } from '../../types'
 import InfiniteScroll from 'react-infinite-scroll-component'
 
 const TodoList: React.FC = () => {
@@ -17,8 +16,6 @@ const TodoList: React.FC = () => {
   }, [getAllTodo, page, todos.meta.pagination.pageCount])
 
   const goToNextPage = () => {
-    console.log(page < pageCount)
-    console.log(page, pageCount)
     if (page < pageCount) {
       setPage(page + 1)
     }
@@ -30,7 +27,11 @@ const TodoList: React.FC = () => {
       next={goToNextPage}
       hasMore={todos.list.length < todos.meta.pagination.total}
       loader={<Divider plain>Загрузка...</Divider>}
-      endMessage={<Divider plain>Конец списка 🤐</Divider>}
+      endMessage={
+        <Divider data-testid='test-end' plain>
+          Конец списка 🤐
+        </Divider>
+      }
     >
       <List
         dataSource={todos.list}
@@ -40,4 +41,4 @@ const TodoList: React.FC = () => {
   )
 }
 
-export default TodoList
+export { TodoList }

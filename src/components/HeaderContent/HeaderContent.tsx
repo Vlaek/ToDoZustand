@@ -1,8 +1,8 @@
 import { Button, Input, Modal, Select } from 'antd'
 import React, { FC, useState } from 'react'
-import useTodoStore from '../stores/todoStore'
-import { TFilter } from '../types'
-import { ButtonContainer, HeaderContainer, ModalContainer } from '../styles/sharedStyles'
+import useTodoStore from '../../stores/todoStore'
+import { TFilter } from '../../types'
+import { ButtonContainer, HeaderContainer, ModalContainer } from '../../styles/sharedStyles'
 
 const { Option } = Select
 
@@ -84,4 +84,4 @@ const HeaderContent: FC = () => {
   )
 }
 
-export default HeaderContent
+export { HeaderContent }

@@ -1,6 +1,5 @@
 import { Layout } from 'antd'
-import TodoList from './components/TodoList'
-import HeaderContent from './components/HeaderContent'
+import { HeaderContent, TodoList } from './components'
 
 const { Header, Content } = Layout
 
